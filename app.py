@@ -82,17 +82,29 @@ def data_analysis(acoes, inspecoes):
     #checkbox se deseja filtrar por subtema
     filtrotema = st.checkbox('Filtrar por Subtema')
     
+
+
     if filtrotema:
         subtemas = st.multiselect('Selecione os subtemas que deseja incluir na análise', allsub, default=allsub)
         filtrado = filtrado.loc[filtrado['Subtema'].isin(subtemas)]
+        
     
     
     #Apresentando total de dados
     acao = filtrado['Ação'].unique()
     h_acao = dfa.loc[dfa['Ação'].isin(acao)]
     h_acao['total'] = h_acao['Horas de elaboração documental']*h_acao['Ninsp']
-    
 
+    #to_datetime
+    h_acao['Concluído'] = pd.to_datetime(h_acao['Concluído'], errors='coerce')
+
+    #criando coluna mês
+    h_acao['Mês'] = h_acao['Concluído'].dt.month
+
+    if filtrotema:
+        h_acao =  h_acao.loc[h_acao['Subtema'].isin(subtemas)]
+    
+    
     
     #printando totais
     total_horas = sum(h_acao['total'])+sum(filtrado['Total Horas de Inspeção'])
@@ -110,16 +122,12 @@ def data_analysis(acoes, inspecoes):
     #plotando gráfico 1
     # plotar o número de casos confirmados
 
-    acao_mes = filtrado['Ação'].groupby(filtrado['Mês']).agg('count')
+    acao_mes = h_acao['Ação'].groupby(h_acao['Mês']).agg('count')
     insp_mes = filtrado['Ação'].groupby(filtrado['Mês']).agg('count')
     horas_insp = filtrado['Total Horas de Inspeção'].groupby(filtrado['Mês']).agg('sum')
+
+
     
-
-    #to_datetime
-    h_acao['Concluído'] = pd.to_datetime(h_acao['Concluído'], errors='coerce')
-
-    #criando coluna mês
-    h_acao['Mês'] = h_acao['Concluído'].dt.month
 
     #tratando as horas por mês
     horas_acao = h_acao['total'].groupby(h_acao['Mês']).agg('sum')
