@@ -86,6 +86,7 @@ def data_analysis(acoes, inspecoes):
         subtemas = st.multiselect('Selecione os subtemas que deseja incluir na análise', allsub, default=allsub)
         filtrado = filtrado.loc[filtrado['Subtema'].isin(subtemas)]
     
+    
     #Apresentando total de dados
     acao = filtrado['Ação'].unique()
     h_acao = dfa.loc[dfa['Ação'].isin(acao)]
@@ -109,7 +110,7 @@ def data_analysis(acoes, inspecoes):
     #plotando gráfico 1
     # plotar o número de casos confirmados
 
-    acao_mes = h_acao['Ação'].groupby(filtrado['Mês']).agg('count')
+    acao_mes = filtrado['Ação'].groupby(filtrado['Mês']).agg('count')
     insp_mes = filtrado['Ação'].groupby(filtrado['Mês']).agg('count')
     horas_insp = filtrado['Total Horas de Inspeção'].groupby(filtrado['Mês']).agg('sum')
     
